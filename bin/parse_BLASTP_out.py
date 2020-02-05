@@ -62,33 +62,39 @@ for line in input2:
         Cterm_seq=sseq[send-1:]
     else:
         Cterm_seq=sseq[send-3:send+3]
-
+    
+    cat_rank = 0
     if alignlen==peplen:
         if float(ident)==100:
-            category="match to known protein"
-        
+            category="match to known protein
+            cat_rank = 4
         elif int(gap)==0 and int(mismatch)==1:
             category="map to known protein with 1 aa mismatch"
+            cat_rank = 3
             for i in range(peplen):
                 if qid[i]!=alignseq[i]:
                     single_sub_pos=str(i+1)
 
         elif int(gap)==1 and int(mismatch)==0:
             category="map to known protein with 1 aa insertion"
+            cat_rank = 2
         else:
             category="novelpep (map to known protein with more than 2 mismatched aa)"
+            cat_rank = 1
     elif peplen-alignlen==1 and float(ident)==100:
         category="map to known protein with 1 aa deletion"
+        cat_rank = 2
 
     else:
         category="novelpep (map to known protein with more than 2 mismatched aa)"
+        cat_rank = 1
     
     if qid not in hits_dic:
-        hits_dic[qid]=evalue
+        hits_dic[qid]=cat_rank
         blastout[qid]=[category,sid,ident,peplen,single_sub_pos,Nterm_seq,alignseq,Cterm_seq,alignlen,mismatch,gap]
     else:
-        if evalue<hits_dic[qid]:
-            hits_dic[qid]=evalue
+        if cat_rank > hits_dic[qid]:
+            hits_dic[qid]=cat_rank
             blastout[qid]=[category,sid,ident,peplen,single_sub_pos,Nterm_seq,alignseq,Cterm_seq,alignlen,mismatch,gap]
 
 header=input3.readline().strip().split("\t")
